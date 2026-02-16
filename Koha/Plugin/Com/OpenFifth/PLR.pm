@@ -10,7 +10,7 @@ use MIME::Lite;
 use DateTime;
 use File::Spec;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 our $MINIMUM_VERSION = "22.05.00.000";
 
 our $metadata = {
