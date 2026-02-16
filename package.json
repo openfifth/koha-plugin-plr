@@ -1,0 +1,22 @@
+{
+  "name": "koha-plugin-plr",
+  "version": "1.0.0",
+  "description": "Koha plugin for PLR (Public Lending Right) reports",
+  "main": "Koha/Plugin/Com/OpenFifth/PLR.pm",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/koha-plugin-plr.git"
+  },
+  "keywords": [
+    "koha",
+    "plugin",
+    "plr",
+    "public-lending-right",
+    "library"
+  ],
+  "author": "OpenFifth",
+  "license": "GPL-3.0"
+}
