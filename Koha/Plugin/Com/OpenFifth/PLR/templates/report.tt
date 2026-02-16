@@ -1,6 +1,14 @@
+[% USE raw %]
+[% USE Asset %]
 [% USE KohaDates %]
+[% PROCESS 'i18n.inc' %]
+[% SET footerjs = 1 %]
 [% INCLUDE 'doc-head-open.inc' %]
-<title>PLR Reports</title>
+<title>[% FILTER collapse %]
+    [% t("PLR Reports") | html %] &rsaquo;
+    [% t("Reports") | html %] &rsaquo;
+    [% t("Koha") | html %]
+[% END %]</title>
 [% INCLUDE 'doc-head-close.inc' %]
 <style>
     .plr-report {
@@ -43,25 +51,31 @@
     }
 </style>
 </head>
-<body>
-[% INCLUDE 'header.inc' %]
-[% INCLUDE 'cat-search.inc' %]
+<body id="plugins_plr_report" class="plugins">
+[% WRAPPER 'header.inc' %]
+    [% INCLUDE 'cat-search.inc' %]
+[% END %]
 
-<div id="breadcrumbs">
-    <a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo;
-    <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugins</a> &rsaquo;
-    PLR Reports &rsaquo; Tool
-</div>
+[% WRAPPER 'sub-header.inc' %]
+    [% WRAPPER breadcrumbs %]
+        [% WRAPPER breadcrumb_item %]
+            <a href="/cgi-bin/koha/reports/reports-home.pl">Reports</a>
+        [% END %]
+        [% WRAPPER breadcrumb_item bc_active= 1 %]
+            <span>PLR Reports</span>
+        [% END %]
+    [% END #/ WRAPPER breadcrumbs %]
+[% END #/ WRAPPER sub-header.inc %]
 
-<div class="main container-fluid">
+<div id="main container-fluid">
     <div class="row">
-        <div class="col-sm-10 col-sm-push-2">
+        <div class="col-md-10 order-md-2 order-sm-1">
             <main>
-                <h1>PLR Reports Tool</h1>
+                <h1>PLR Reports</h1>
 
                 [% IF error %]
                     <div class="alert alert-danger">
-                        <strong>Error:</strong> [% error %]
+                        <strong>Error:</strong> [% error | html %]
                     </div>
                 [% END %]
 
@@ -71,7 +85,7 @@
                     </div>
                 [% ELSIF email_error %]
                     <div class="alert alert-danger">
-                        <strong>Email Error:</strong> [% email_error %]
+                        <strong>Email Error:</strong> [% email_error | html %]
                     </div>
                 [% END %]
 
@@ -114,52 +128,60 @@
                         <h3>Report Statistics</h3>
                         <dl>
                             <dt>Report Period:</dt>
-                            <dd>[% start_date %] - [% end_date %]</dd>
+                            <dd>[% start_date | html %] - [% end_date | html %]</dd>
 
                             <dt>Total ISBNs:</dt>
-                            <dd>[% isbn_count %]</dd>
+                            <dd>[% isbn_count | html %]</dd>
 
                             <dt>Total Issues:</dt>
-                            <dd>[% issue_count %]</dd>
+                            <dd>[% issue_count | html %]</dd>
 
                             <dt>Filename:</dt>
-                            <dd>[% report_filename %]</dd>
+                            <dd>[% report_filename | html %]</dd>
                         </dl>
                     </div>
 
                     <h3>Report Preview</h3>
                     <p>This is the content that will be sent to the British Library:</p>
-                    <div class="plr-report">[% report_content %]</div>
+                    <div class="plr-report">[% report_content | html %]</div>
 
-                    <h4>Report Format</h4>
-                    <p>The report follows the PLR standard format:</p>
-                    <ul>
-                        <li><strong>Header:</strong> Authority Code | Start Date | End Date</li>
-                        <li><strong>Data Lines:</strong> ISBN | Issue Count | Copy Count | Author Code | Item Type</li>
-                        <li><strong>Footer:</strong> Total ISBNs | Total Issues</li>
-                    </ul>
+                    <div class="alert alert-info">
+                        <h4>Report Format</h4>
+                        <p>The report follows the PLR standard format:</p>
+                        <ul>
+                            <li><strong>Header:</strong> Authority Code | Start Date | End Date</li>
+                            <li><strong>Data Lines:</strong> ISBN | Issue Count | Copy Count | Author Code | Item Type</li>
+                            <li><strong>Footer:</strong> Total ISBNs | Total Issues</li>
+                        </ul>
+                    </div>
                 [% END %]
 
                 <hr />
 
                 <h2>Information</h2>
-                <p>
-                    <strong>About PLR Reports:</strong> The Public Lending Right (PLR) is the right for authors to receive payment
-                    for the loans of their books from public libraries. This plugin generates reports of lending activity
-                    to be submitted to the British Library.
-                </p>
-                <p>
-                    <strong>Automated Sending:</strong> You can configure the plugin to automatically send reports on a
-                    specific day of each month. Configure this in the plugin settings.
-                </p>
-                <p>
-                    <strong>Manual Sending:</strong> Use this page to generate, preview, and manually send reports at any time.
-                </p>
+                <div class="alert alert-info">
+                    <p>
+                        <strong>About PLR Reports:</strong> The Public Lending Right (PLR) is the right for authors to receive payment
+                        for the loans of their books from public libraries. This plugin generates reports of lending activity
+                        to be submitted to the British Library.
+                    </p>
+                    <p>
+                        <strong>Automated Sending:</strong> You can configure the plugin to automatically send reports on a
+                        specific day of each month. Configure this in the <a href="/cgi-bin/koha/plugins/run.pl?class=[% CLASS | uri %]&method=configure">plugin settings</a>.
+                    </p>
+                    <p>
+                        <strong>Manual Sending:</strong> Use this page to generate, preview, and manually send reports at any time.
+                    </p>
+                </div>
             </main>
         </div>
-        <div class="col-sm-2 col-sm-pull-10">
-            [% INCLUDE 'tools-menu.inc' %]
+        <div class="col-md-2 order-sm-2 order-md-1">
+            <aside></aside>
         </div>
     </div>
 </div>
+
+[% MACRO jsinclude BLOCK %]
+[% END %]
+
 [% INCLUDE 'intranet-bottom.inc' %]
