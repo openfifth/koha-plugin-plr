@@ -92,7 +92,7 @@ sub configure {
     }
 }
 
-sub tool {
+sub report {
     my ( $self, $args ) = @_;
     my $cgi = $self->{'cgi'};
 
@@ -102,7 +102,7 @@ sub tool {
         my $report_data = $self->generate_plr_report();
 
         if ( $report_data ) {
-            my $template = $self->get_template({ file => 'templates/tool.tt' });
+            my $template = $self->get_template({ file => 'templates/report.tt' });
             $template->param(
                 report_generated => 1,
                 report_content => $report_data->{content},
@@ -115,7 +115,7 @@ sub tool {
             $self->output_html( $template->output() );
         }
         else {
-            my $template = $self->get_template({ file => 'templates/tool.tt' });
+            my $template = $self->get_template({ file => 'templates/report.tt' });
             $template->param(
                 error => 'Failed to generate report. Please check configuration.',
             );
@@ -134,7 +134,7 @@ sub tool {
     }
     elsif ( $action eq 'send' ) {
         my $result = $self->send_plr_report();
-        my $template = $self->get_template({ file => 'templates/tool.tt' });
+        my $template = $self->get_template({ file => 'templates/report.tt' });
         $template->param(
             email_sent => $result->{success},
             email_error => $result->{error},
@@ -142,7 +142,7 @@ sub tool {
         $self->output_html( $template->output() );
     }
     else {
-        my $template = $self->get_template({ file => 'templates/tool.tt' });
+        my $template = $self->get_template({ file => 'templates/report.tt' });
         $self->output_html( $template->output() );
     }
 }
