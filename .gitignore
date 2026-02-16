@@ -1,0 +1,6 @@
+*.kpz
+*.tar.gz
+.DS_Store
+*~
+.*.swp
+/var/

@@ -1,0 +1,108 @@
+[% USE KohaDates %]
+[% INCLUDE 'doc-head-open.inc' %]
+<title>Configure PLR Reports Plugin</title>
+[% INCLUDE 'doc-head-close.inc' %]
+</head>
+<body>
+[% INCLUDE 'header.inc' %]
+[% INCLUDE 'cat-search.inc' %]
+
+<div id="breadcrumbs">
+    <a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo;
+    <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugins</a> &rsaquo;
+    PLR Reports &rsaquo; Configure
+</div>
+
+<div class="main container-fluid">
+    <div class="row">
+        <div class="col-sm-10 col-sm-push-2">
+            <main>
+                <h1>PLR Reports Configuration</h1>
+                <p>Configure Public Lending Right (PLR) reporting settings for automated submission to the British Library.</p>
+
+                <form method="post">
+                    <input type="hidden" name="class" value="[% CLASS %]"/>
+                    <input type="hidden" name="method" value="[% METHOD %]"/>
+                    <input type="hidden" name="save" value="1" />
+
+                    <fieldset class="rows">
+                        <legend>Authority Information</legend>
+                        <ol>
+                            <li>
+                                <label for="authority_code" class="required">Authority Code: </label>
+                                <input type="text" id="authority_code" name="authority_code" value="[% authority_code %]" required />
+                                <span class="required">Required</span>
+                                <div class="hint">Your library's PLR authority code (e.g., 2345)</div>
+                            </li>
+                            <li>
+                                <label for="authority_name" class="required">Authority Name: </label>
+                                <input type="text" id="authority_name" name="authority_name" value="[% authority_name %]" required />
+                                <span class="required">Required</span>
+                                <div class="hint">Your library's full name for PLR reports</div>
+                            </li>
+                        </ol>
+                    </fieldset>
+
+                    <fieldset class="rows">
+                        <legend>Email Settings</legend>
+                        <ol>
+                            <li>
+                                <label for="email_recipients" class="required">Email Recipients: </label>
+                                <input type="text" id="email_recipients" name="email_recipients" value="[% email_recipients %]" size="80" required />
+                                <span class="required">Required</span>
+                                <div class="hint">Comma-separated email addresses (e.g., Joanne.Hawkins@bl.uk,plrlibrary@bl.uk)</div>
+                            </li>
+                            <li>
+                                <label for="email_from" class="required">Email From: </label>
+                                <input type="text" id="email_from" name="email_from" value="[% email_from %]" required />
+                                <span class="required">Required</span>
+                                <div class="hint">Sender email address</div>
+                            </li>
+                        </ol>
+                    </fieldset>
+
+                    <fieldset class="rows">
+                        <legend>Automated Sending</legend>
+                        <ol>
+                            <li>
+                                <label for="auto_send_enabled">Enable Automatic Sending: </label>
+                                <input type="checkbox" id="auto_send_enabled" name="auto_send_enabled" value="1" [% IF auto_send_enabled %]checked[% END %] />
+                                <div class="hint">Automatically send reports via the cronjob_nightly hook</div>
+                            </li>
+                            <li>
+                                <label for="send_day_of_month">Send Day of Month: </label>
+                                <select id="send_day_of_month" name="send_day_of_month">
+                                    [% FOREACH day IN [1..28] %]
+                                        <option value="[% day %]" [% IF send_day_of_month == day %]selected[% END %]>[% day %]</option>
+                                    [% END %]
+                                </select>
+                                <div class="hint">Day of the month to automatically send the report (typically 1st for previous month's data)</div>
+                            </li>
+                        </ol>
+                    </fieldset>
+
+                    <fieldset class="action">
+                        <input type="submit" value="Save configuration" />
+                        <a class="cancel" href="/cgi-bin/koha/plugins/plugins-home.pl">Cancel</a>
+                    </fieldset>
+                </form>
+
+                <hr />
+
+                <h2>About PLR Reports</h2>
+                <p>This plugin generates Public Lending Right (PLR) reports based on your library's loan statistics.
+                The report includes:</p>
+                <ul>
+                    <li>Issues and renewals from the previous calendar month</li>
+                    <li>ISBN, contributor, item type, and copy count for each title</li>
+                    <li>Summary statistics (total ISBNs and issues)</li>
+                </ul>
+                <p>Reports can be generated manually from the tool page or sent automatically via cron on a configured day of the month.</p>
+            </main>
+        </div>
+        <div class="col-sm-2 col-sm-pull-10">
+            [% INCLUDE 'tools-menu.inc' %]
+        </div>
+    </div>
+</div>
+[% INCLUDE 'intranet-bottom.inc' %]
