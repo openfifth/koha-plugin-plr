@@ -1,10 +1,21 @@
 {
+  "plugin": {
+    "module": "Koha::Plugin::Com::OpenFifth::PLR",
+    "pm_path": "Koha/Plugin/Com/OpenFifth/PLR.pm"
+  },
   "name": "koha-plugin-plr",
   "version": "1.0.0",
+  "previous_version": "1.0.0",
   "description": "Koha plugin for PLR (Public Lending Right) reports",
   "main": "Koha/Plugin/Com/OpenFifth/PLR.pm",
   "scripts": {
-    "build": "node build.js"
+    "build": "./build.sh",
+    "version:patch": "node increment_version.js patch | cat",
+    "version:minor": "node increment_version.js minor | cat",
+    "version:major": "node increment_version.js major | cat",
+    "release:patch": "node increment_version.js patch | cat && PLUGIN_FILE=$(node -p 'require(\"./package.json\").plugin.pm_path') && git add package.json \"$PLUGIN_FILE\" && git commit -m 'chore: bump version' && VERSION=$(node -p 'require(\"./package.json\").version') && git tag -a v$VERSION -m \"Release v$VERSION\" && git push origin main --follow-tags",
+    "release:minor": "node increment_version.js minor | cat && PLUGIN_FILE=$(node -p 'require(\"./package.json\").plugin.pm_path') && git add package.json \"$PLUGIN_FILE\" && git commit -m 'chore: bump version' && VERSION=$(node -p 'require(\"./package.json\").version') && git tag -a v$VERSION -m \"Release v$VERSION\" && git push origin main --follow-tags",
+    "release:major": "node increment_version.js major | cat && PLUGIN_FILE=$(node -p 'require(\"./package.json\").plugin.pm_path') && git add package.json \"$PLUGIN_FILE\" && git commit -m 'chore: bump version' && VERSION=$(node -p 'require(\"./package.json\").version') && git tag -a v$VERSION -m \"Release v$VERSION\" && git push origin main --follow-tags"
   },
   "repository": {
     "type": "git",
