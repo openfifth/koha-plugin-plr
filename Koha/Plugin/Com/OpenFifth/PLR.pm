@@ -177,10 +177,10 @@ sub generate_plr_report {
         SELECT
             COUNT(s.itemnumber) AS COUNT,
             bi.isbn AS ISBN,
-            UPPER(SUBSTRING(b.author,1,4)) AS AUTHOR,
+            UPPER(SUBSTRING(MAX(b.author),1,4)) AS AUTHOR,
             s.itemtype AS ITEMTYPE,
-            s.itemnumber AS ITEMNUMBER,
-            i.biblionumber AS BIBLIONUMBER
+            MAX(s.itemnumber) AS ITEMNUMBER,
+            MAX(i.biblionumber) AS BIBLIONUMBER
         FROM statistics s
         LEFT JOIN items i ON (s.itemnumber = i.itemnumber)
         LEFT JOIN biblioitems bi ON (i.biblionumber = bi.biblionumber)
@@ -189,8 +189,8 @@ sub generate_plr_report {
             AND s.datetime < ?
             AND s.type IN ('issue', 'renew')
             AND bi.isbn IS NOT NULL
-        GROUP BY bi.isbn
-        ORDER BY bi.isbn
+        GROUP BY bi.isbn, s.itemtype
+        ORDER BY bi.isbn, s.itemtype
     };
 
     my $sth = $dbh->prepare($sql);
