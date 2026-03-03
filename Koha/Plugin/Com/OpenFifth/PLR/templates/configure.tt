@@ -50,23 +50,45 @@
                     <input type="hidden" name="class" value="[% CLASS %]"/>
                     <input type="hidden" name="method" value="[% METHOD %]"/>
                     <input type="hidden" name="save" value="1" />
+                    <input type="hidden" name="report_count" id="report_count" value="[% reports.size %]" />
 
                     <fieldset class="rows">
-                        <legend>Authority Information</legend>
-                        <ol>
-                            <li>
-                                <label for="authority_code" class="required">Authority Code: </label>
-                                <input type="text" id="authority_code" name="authority_code" value="[% authority_code | html %]" required />
-                                <span class="required">Required</span>
-                                <div class="hint">Your library's PLR authority code (e.g., 2345)</div>
-                            </li>
-                            <li>
-                                <label for="authority_name" class="required">Authority Name: </label>
-                                <input type="text" id="authority_name" name="authority_name" value="[% authority_name | html %]" size="60" required />
-                                <span class="required">Required</span>
-                                <div class="hint">Your library's full name for PLR reports</div>
-                            </li>
-                        </ol>
+                        <legend>Reports</legend>
+                        <p>Each report generates a separate PLR submission. Where multiple authorities share one Koha system,
+                        use the Library Group ID to scope each report to the appropriate branches.</p>
+                        <table id="reports-table" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Authority Code <span class="required">*</span></th>
+                                    <th>Authority Name <span class="required">*</span></th>
+                                    <th>Library Group ID</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="reports-tbody">
+                                [% FOREACH r IN reports %]
+                                    [% SET i = loop.index %]
+                                    <tr>
+                                        <td>
+                                            <input type="text" name="authority_code_[% i %]" value="[% r.authority_code | html %]" required class="form-control" />
+                                        </td>
+                                        <td>
+                                            <input type="text" name="authority_name_[% i %]" value="[% r.authority_name | html %]" required class="form-control" />
+                                        </td>
+                                        <td>
+                                            <input type="number" name="library_group_id_[% i %]" value="[% r.library_group_id | html %]" class="form-control" min="1" />
+                                            <div class="hint">Parent ID from library_groups table (leave blank for all branches)</div>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="removeReport(this)">Remove</button>
+                                        </td>
+                                    </tr>
+                                [% END %]
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-default" onclick="addReport()">
+                            <i class="fa fa-plus"></i> Add report
+                        </button>
                     </fieldset>
 
                     <fieldset class="rows">
@@ -121,6 +143,74 @@
 </div>
 
 [% MACRO jsinclude BLOCK %]
+<script>
+function addReport() {
+    var tbody = document.getElementById('reports-tbody');
+    var count = parseInt(document.getElementById('report_count').value, 10);
+    var i = count;
+
+    var tr = document.createElement('tr');
+
+    var tdCode = document.createElement('td');
+    var inputCode = document.createElement('input');
+    inputCode.type = 'text';
+    inputCode.name = 'authority_code_' + i;
+    inputCode.required = true;
+    inputCode.className = 'form-control';
+    tdCode.appendChild(inputCode);
+
+    var tdName = document.createElement('td');
+    var inputName = document.createElement('input');
+    inputName.type = 'text';
+    inputName.name = 'authority_name_' + i;
+    inputName.required = true;
+    inputName.className = 'form-control';
+    tdName.appendChild(inputName);
+
+    var tdGroup = document.createElement('td');
+    var inputGroup = document.createElement('input');
+    inputGroup.type = 'number';
+    inputGroup.name = 'library_group_id_' + i;
+    inputGroup.className = 'form-control';
+    inputGroup.min = '1';
+    var hint = document.createElement('div');
+    hint.className = 'hint';
+    hint.textContent = 'Parent ID from library_groups table (leave blank for all branches)';
+    tdGroup.appendChild(inputGroup);
+    tdGroup.appendChild(hint);
+
+    var tdBtn = document.createElement('td');
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn-danger btn-sm';
+    btn.textContent = 'Remove';
+    btn.addEventListener('click', function() { removeReport(btn); });
+    tdBtn.appendChild(btn);
+
+    tr.appendChild(tdCode);
+    tr.appendChild(tdName);
+    tr.appendChild(tdGroup);
+    tr.appendChild(tdBtn);
+
+    tbody.appendChild(tr);
+    document.getElementById('report_count').value = count + 1;
+}
+
+function removeReport(btn) {
+    btn.closest('tr').remove();
+    reindexReports();
+}
+
+function reindexReports() {
+    var rows = document.querySelectorAll('#reports-tbody tr');
+    rows.forEach(function(row, i) {
+        row.querySelectorAll('input').forEach(function(input) {
+            input.name = input.name.replace(/_\d+$/, '_' + i);
+        });
+    });
+    document.getElementById('report_count').value = rows.length;
+}
+</script>
 [% END %]
 
 [% INCLUDE 'intranet-bottom.inc' %]
