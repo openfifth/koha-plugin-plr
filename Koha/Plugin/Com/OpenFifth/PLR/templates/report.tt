@@ -49,6 +49,12 @@
         display: inline-block;
         margin-right: 10px;
     }
+    .plr-report-block {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 15px;
+        margin: 20px 0;
+    }
 </style>
 </head>
 <body id="plugins_plr_report" class="plugins">
@@ -79,14 +85,18 @@
                     </div>
                 [% END %]
 
-                [% IF email_sent %]
-                    <div class="alert alert-success">
-                        <strong>Success!</strong> PLR report has been sent successfully.
-                    </div>
-                [% ELSIF email_error %]
-                    <div class="alert alert-danger">
-                        <strong>Email Error:</strong> [% email_error | html %]
-                    </div>
+                [% IF send_results %]
+                    [% FOREACH r IN send_results %]
+                        [% IF r.success %]
+                            <div class="alert alert-success">
+                                <strong>Sent:</strong> [% r.authority_code | html %] &ndash; [% r.authority_name | html %]
+                            </div>
+                        [% ELSE %]
+                            <div class="alert alert-danger">
+                                <strong>Failed ([% r.authority_code | html %]):</strong> [% r.error | html %]
+                            </div>
+                        [% END %]
+                    [% END %]
                 [% END %]
 
                 <p>Generate Public Lending Right (PLR) reports for submission to the British Library.</p>
@@ -99,54 +109,60 @@
                         <input type="hidden" name="method" value="[% METHOD %]"/>
                         <input type="hidden" name="action" value="generate" />
                         <button type="submit" class="btn btn-primary">
-                            <i class="fa fa-file-text"></i> Generate Report
+                            <i class="fa fa-file-text"></i> Generate Reports
                         </button>
                     </form>
 
-                    [% IF report_generated %]
-                        <form method="post">
-                            [% INCLUDE 'csrf-token.inc' %]
-                            <input type="hidden" name="class" value="[% CLASS %]"/>
-                            <input type="hidden" name="method" value="[% METHOD %]"/>
-                            <input type="hidden" name="action" value="download" />
-                            <button type="submit" class="btn btn-default">
-                                <i class="fa fa-download"></i> Download Report
-                            </button>
-                        </form>
-
+                    [% IF reports_generated %]
                         <form method="post">
                             [% INCLUDE 'csrf-token.inc' %]
                             <input type="hidden" name="class" value="[% CLASS %]"/>
                             <input type="hidden" name="method" value="[% METHOD %]"/>
                             <input type="hidden" name="action" value="send" />
-                            <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to send this report to the British Library?');">
-                                <i class="fa fa-envelope"></i> Send Report via Email
+                            <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to send all reports to the British Library?');">
+                                <i class="fa fa-envelope"></i> Send All Reports
                             </button>
                         </form>
                     [% END %]
                 </div>
 
-                [% IF report_generated %]
-                    <div class="plr-stats">
-                        <h3>Report Statistics</h3>
-                        <dl>
-                            <dt>Report Period:</dt>
-                            <dd>[% start_date | html %] - [% end_date | html %]</dd>
+                [% IF reports_generated %]
+                    [% FOREACH r IN reports_data %]
+                        <div class="plr-report-block">
+                            <h3>[% r.authority_code | html %] &ndash; [% r.authority_name | html %]</h3>
 
-                            <dt>Total ISBNs:</dt>
-                            <dd>[% isbn_count | html %]</dd>
+                            <div class="plr-stats">
+                                <dl>
+                                    <dt>Report Period:</dt>
+                                    <dd>[% r.start_date | html %] &ndash; [% r.end_date | html %]</dd>
 
-                            <dt>Total Issues:</dt>
-                            <dd>[% issue_count | html %]</dd>
+                                    <dt>Total ISBNs:</dt>
+                                    <dd>[% r.isbn_count | html %]</dd>
 
-                            <dt>Filename:</dt>
-                            <dd>[% report_filename | html %]</dd>
-                        </dl>
-                    </div>
+                                    <dt>Total Issues:</dt>
+                                    <dd>[% r.issue_count | html %]</dd>
 
-                    <h3>Report Preview</h3>
-                    <p>This is the content that will be sent to the British Library:</p>
-                    <div class="plr-report">[% report_content | html %]</div>
+                                    <dt>Filename:</dt>
+                                    <dd>[% r.filename | html %]</dd>
+                                </dl>
+                            </div>
+
+                            <h4>Report Preview</h4>
+                            <p>This is the content that will be sent to the British Library:</p>
+                            <div class="plr-report">[% r.content | html %]</div>
+
+                            <form method="post" style="display:inline-block;">
+                                [% INCLUDE 'csrf-token.inc' %]
+                                <input type="hidden" name="class" value="[% CLASS %]"/>
+                                <input type="hidden" name="method" value="[% METHOD %]"/>
+                                <input type="hidden" name="action" value="download" />
+                                <input type="hidden" name="report_index" value="[% r.report_index %]" />
+                                <button type="submit" class="btn btn-default">
+                                    <i class="fa fa-download"></i> Download
+                                </button>
+                            </form>
+                        </div>
+                    [% END %]
 
                     <div class="alert alert-info">
                         <h4>Report Format</h4>
