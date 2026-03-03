@@ -11,7 +11,7 @@ use DateTime;
 use File::Spec;
 use JSON qw(encode_json decode_json);
 
-our $VERSION = '1.1.0';
+our $VERSION = '1.2.0';
 our $MINIMUM_VERSION = "22.05.00.000";
 
 our $metadata = {
@@ -19,7 +19,7 @@ our $metadata = {
     author          => 'OpenFifth',
     description     => 'Public Lending Right (PLR) reporting plugin for automated submission to the British Library',
     date_authored   => '2026-02-16',
-    date_updated    => '2026-02-16',
+    date_updated    => '2026-03-03',
     minimum_version => $MINIMUM_VERSION,
     maximum_version => undef,
     version         => $VERSION,
