@@ -44,7 +44,7 @@ sub install {
     $self->store_data({
         reports_config    => encode_json([]),
         email_recipients  => 'hosting@openfifth.co.uk,plrlibrary@bl.uk',
-        email_from        => 'mail@openfifth.co.uk',
+        email_from        => '',
         auto_send_enabled => 0,
         send_day_of_month => 1,
     });
@@ -54,6 +54,11 @@ sub install {
 
 sub upgrade {
     my ( $self, $args ) = @_;
+
+    # Earlier releases stored a hard-coded sender; fall back to Koha's own
+    # from address instead.
+    my $email_from = $self->retrieve_data('email_from') // '';
+    $self->store_data({ email_from => '' }) if $email_from eq 'mail@openfifth.co.uk';
 
     my $existing = $self->retrieve_data('reports_config');
     my $old_code = $self->retrieve_data('authority_code');
@@ -380,7 +385,7 @@ sub _send_single_report {
     my $email_recipients = $self->retrieve_data('email_recipients');
     my $email_from       = $self->retrieve_data('email_from');
 
-    unless ( $email_recipients && $email_from ) {
+    unless ($email_recipients) {
         return {
             success        => 0,
             error          => 'Missing email configuration',
@@ -419,7 +424,7 @@ sub _send_single_report {
                 },
                 message_transport_type => 'email',
                 to_address             => $email_recipients,
-                from_address           => $email_from,
+                ( $email_from ? ( from_address => $email_from ) : () ),
             }
         );
         die "Could not queue message\n" unless $message_id;

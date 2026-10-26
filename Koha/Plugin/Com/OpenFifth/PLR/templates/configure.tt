@@ -101,10 +101,9 @@
                                 <div class="hint">Comma-separated email addresses (e.g., plrlibrary@bl.uk)</div>
                             </li>
                             <li>
-                                <label for="email_from" class="required">Email From: </label>
-                                <input type="text" id="email_from" name="email_from" value="[% email_from | html %]" required />
-                                <span class="required">Required</span>
-                                <div class="hint">Sender email address</div>
+                                <label for="email_from">Email From: </label>
+                                <input type="text" id="email_from" name="email_from" value="[% email_from | html %]" />
+                                <div class="hint">Optional. Leave blank to send from Koha's default sender address (the KohaAdminEmailAddress system preference).</div>
                             </li>
                         </ol>
                     </fieldset>

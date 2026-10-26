@@ -12,6 +12,10 @@ along with the comparison links — do not edit the heading or the links by hand
 
 ## [Unreleased]
 
+### Changed
+
+- "Email From" is now optional and no longer defaults to a hard-coded address. When blank, Koha's default sender address (`KohaAdminEmailAddress`) is used. An existing `mail@openfifth.co.uk` setting is cleared on upgrade.
+
 ## [1.3.0] - 2026-10-26
 
 ### Added

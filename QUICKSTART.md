@@ -24,7 +24,7 @@ After installation, find "PLR Reports" in the plugins list:
    Authority Name: [Your library name from the script]
 
    Email Recipients: hosting@openfifth.co.uk,plrlibrary@bl.uk
-   Email From: mail@openfifth.co.uk
+   Email From: (leave blank to use Koha's default sender address)
 
    ☐ Enable Automatic Sending (optional - check to enable)
    Send Day of Month: 1
@@ -78,7 +78,7 @@ crontab -e
 The plugin comes pre-configured with these defaults from your original script:
 
 - **Email Recipients**: hosting@openfifth.co.uk,plrlibrary@bl.uk
-- **Sender Email**: mail@openfifth.co.uk
+- **Sender Email**: blank, so Koha's default sender address (`KohaAdminEmailAddress`) is used
 - **Send Day**: 1st of each month
 - **Report Format**: Identical to original script output
 

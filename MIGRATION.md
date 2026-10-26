@@ -27,7 +27,7 @@ Replace these script placeholders with plugin configuration values:
 | `<Authority Name>` | Authority Name | "Example Library" |
 | `<filename>` | Auto-generated | "plrdata_16022026.txt" |
 | Email recipients | Email Recipients | "..." |
-| Sender email | Email From | "mail@openfifth.co.uk" |
+| Sender email | Email From (optional) | "" |
 
 ### Cron Script Replacement
 
