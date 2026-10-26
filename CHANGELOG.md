@@ -12,6 +12,8 @@ along with the comparison links — do not edit the heading or the links by hand
 
 ## [Unreleased]
 
+## [1.3.3] - 2026-10-26
+
 ### Added
 
 - The report page now warns when no reports are configured (and hides the Generate and Send buttons), and lists any configured rows skipped for a missing authority code or name. The configuration page shows the same hint when the Reports table is empty.
@@ -67,7 +69,8 @@ along with the comparison links — do not edit the heading or the links by hand
 
 - `build.sh`; `.kpz` files are now built by the release workflow.
 
-[Unreleased]: https://github.com/openfifth/koha-plugin-plr/compare/v1.3.2...HEAD
+[Unreleased]: https://github.com/openfifth/koha-plugin-plr/compare/v1.3.3...HEAD
+[1.3.3]: https://github.com/openfifth/koha-plugin-plr/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/openfifth/koha-plugin-plr/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/openfifth/koha-plugin-plr/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/openfifth/koha-plugin-plr/compare/v1.2.2...v1.3.0

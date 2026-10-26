@@ -4,8 +4,8 @@
     "pm_path": "Koha/Plugin/Com/OpenFifth/PLR.pm"
   },
   "name": "koha-plugin-plr",
-  "version": "1.3.2",
-  "previous_version": "1.3.1",
+  "version": "1.3.3",
+  "previous_version": "1.3.2",
   "description": "Koha plugin for PLR (Public Lending Right) reports",
   "main": "Koha/Plugin/Com/OpenFifth/PLR.pm",
   "scripts": {
