@@ -24,6 +24,12 @@
 
     <fieldset class="rows">
         <legend>Reports</legend>
+        [% IF !reports.size %]
+            <div class="alert alert-warning">
+                <strong>No reports configured.</strong> Click <em>Add report</em> and enter at least an
+                authority code and name. Nothing is generated or sent until there is one.
+            </div>
+        [% END %]
         <p>Each report generates a separate PLR submission. Where multiple authorities share one Koha system,
         use the Library Group ID to scope each report to the appropriate branches.</p>
         <table id="reports-table" class="table table-bordered table-striped">

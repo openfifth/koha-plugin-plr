@@ -67,7 +67,7 @@
             </div>
         [% ELSE %]
             <div class="alert alert-danger">
-                <strong>Failed ([% r.authority_code | html %]):</strong> [% r.error | html %]
+                <strong>Failed[% IF r.authority_code %] ([% r.authority_code | html %])[% END %]:</strong> [% r.error | html %]
             </div>
         [% END %]
     [% END %]
@@ -76,6 +76,25 @@
 <p>Generate Public Lending Right (PLR) reports for submission to the British Library.</p>
 <p>Reports include loan statistics (issues and renewals) from the previous calendar month.</p>
 
+[% IF !configured_count %]
+    <div class="alert alert-warning">
+        <strong>No reports are configured.</strong>
+        Add at least one report, with an authority code and name, on the
+        <a href="/cgi-bin/koha/plugins/run.pl?class=[% CLASS | uri %]&method=configure">configuration page</a>.
+        Nothing will be generated or sent until you do.
+    </div>
+[% END %]
+
+[% IF incomplete_reports.size %]
+    <div class="alert alert-warning">
+        <strong>Some reports are incomplete and will be skipped:</strong>
+        row[% 's' IF incomplete_reports.size > 1 %] [% incomplete_reports.join(', ') | html %]
+        [% IF incomplete_reports.size > 1 %]are[% ELSE %]is[% END %] missing an authority code or name.
+        Fix this on the <a href="/cgi-bin/koha/plugins/run.pl?class=[% CLASS | uri %]&method=configure">configuration page</a>.
+    </div>
+[% END %]
+
+[% IF configured_count %]
 <div class="button-group">
     <form method="post">
         [% INCLUDE 'csrf-token.inc' %]
@@ -99,6 +118,7 @@
         </form>
     [% END %]
 </div>
+[% END %]
 
 [% IF reports_generated %]
     [% FOREACH r IN reports_data %]

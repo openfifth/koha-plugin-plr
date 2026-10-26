@@ -186,7 +186,21 @@ sub _report_template {
     my ( $self ) = @_;
 
     my $template = $self->get_template({ file => 'templates/report.tt' });
-    $template->param( send_history => $self->_get_send_history() );
+
+    # A report only generates once it has both an authority code and name.
+    my ( $configured, @incomplete ) = ( 0 );
+    my $row = 0;
+    for my $config ( @{ $self->_get_reports_config() } ) {
+        $row++;
+        if   ( $config->{authority_code} && $config->{authority_name} ) { $configured++ }
+        else                                                           { push @incomplete, $row }
+    }
+
+    $template->param(
+        configured_count   => $configured,
+        incomplete_reports => \@incomplete,
+        send_history       => $self->_get_send_history(),
+    );
 
     return $template;
 }
@@ -461,6 +475,17 @@ sub _send_all_reports {
     my $configs = $self->_get_reports_config();
     my @results;
 
+    unless (@$configs) {
+        return [
+            {
+                success        => 0,
+                error          => 'No reports configured',
+                authority_code => '',
+                authority_name => '',
+            }
+        ];
+    }
+
     for my $config ( @$configs ) {
         my $report_data = $self->_generate_plr_report($config);
         if ( !$report_data ) {
@@ -496,6 +521,11 @@ sub cronjob_nightly {
     my $today = DateTime->now()->day;
 
     if ( $today == $send_day ) {
+        unless ( @{ $self->_get_reports_config() } ) {
+            warn "PLR Plugin: Auto-send is enabled but no reports are configured";
+            return;
+        }
+
         my $results = $self->_send_all_reports();
         for my $result ( @$results ) {
             if ( $result->{success} ) {

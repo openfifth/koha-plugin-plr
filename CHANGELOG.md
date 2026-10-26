@@ -12,6 +12,11 @@ along with the comparison links — do not edit the heading or the links by hand
 
 ## [Unreleased]
 
+### Added
+
+- The report page now warns when no reports are configured (and hides the Generate and Send buttons), and lists any configured rows skipped for a missing authority code or name. The configuration page shows the same hint when the Reports table is empty.
+- Sending with no reports configured now reports "No reports configured", and the nightly auto-send logs a warning instead of silently doing nothing.
+
 ## [1.3.2] - 2026-10-26
 
 ### Fixed
