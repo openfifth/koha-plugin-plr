@@ -12,6 +12,8 @@ along with the comparison links — do not edit the heading or the links by hand
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-10-26
+
 ### Fixed
 
 - Adding the first report on a fresh install produced fields named `authority_code_NaN` because the report count started empty instead of 0.
@@ -60,7 +62,8 @@ along with the comparison links — do not edit the heading or the links by hand
 
 - `build.sh`; `.kpz` files are now built by the release workflow.
 
-[Unreleased]: https://github.com/openfifth/koha-plugin-plr/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/openfifth/koha-plugin-plr/compare/v1.3.2...HEAD
+[1.3.2]: https://github.com/openfifth/koha-plugin-plr/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/openfifth/koha-plugin-plr/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/openfifth/koha-plugin-plr/compare/v1.2.2...v1.3.0
 [1.2.2]: https://github.com/openfifth/koha-plugin-plr/compare/v1.2.1...v1.2.2
