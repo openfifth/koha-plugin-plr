@@ -6,7 +6,8 @@ use base qw(Koha::Plugins::Base);
 
 use C4::Context;
 use Koha::DateUtils qw(dt_from_string output_pref);
-use MIME::Lite;
+use Koha::Email;
+use Koha::SMTP::Servers;
 use DateTime;
 use File::Spec;
 use JSON qw(encode_json decode_json);
@@ -370,26 +371,23 @@ sub _send_single_report {
     my $subject        = "PLR Return for $authority_code - $authority_name";
     my $body           = "Dear PLR\n\nPlease find attached PLR return for $authority_code - $authority_name for the last period\n\n";
 
-    my $msg = MIME::Lite->new(
-        From    => $email_from,
-        To      => $email_recipients,
-        Subject => $subject,
-        Type    => 'multipart/mixed',
-    );
-
-    $msg->attach(
-        Type => 'TEXT',
-        Data => $body,
-    );
-
-    $msg->attach(
-        Type        => 'text/plain',
-        Data        => $report_data->{content},
-        Filename    => $report_data->{filename},
-        Disposition => 'attachment',
-    );
-
-    eval { $msg->send };
+    eval {
+        my $email = Koha::Email->create(
+            {
+                from    => $email_from,
+                to      => $email_recipients,
+                subject => $subject,
+            }
+        );
+        $email->text_body($body);
+        $email->attach(
+            $report_data->{content},
+            content_type => 'text/plain',
+            filename     => $report_data->{filename},
+            disposition  => 'attachment',
+        );
+        $email->send_or_die( { transport => Koha::SMTP::Servers->get_default->transport } );
+    };
 
     if ( $@ ) {
         return {

@@ -12,6 +12,10 @@ along with the comparison links — do not edit the heading or the links by hand
 
 ## [Unreleased]
 
+### Fixed
+
+- Plugin silently failed to register (and so never appeared in the plugin list) on servers without `MIME::Lite` installed. Reports are now emailed with Koha's own `Koha::Email` and the default SMTP server, so the plugin has no dependencies beyond Koha itself.
+
 ## [1.2.1] - 2026-10-26
 
 ### Added
