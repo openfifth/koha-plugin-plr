@@ -13,7 +13,7 @@ use DateTime;
 use File::Spec;
 use JSON qw(encode_json decode_json);
 
-our $VERSION         = '1.2.2';
+our $VERSION         = '1.3.0';
 our $MINIMUM_VERSION = "22.05.00.000";
 
 our $metadata = {

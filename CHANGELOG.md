@@ -12,6 +12,8 @@ along with the comparison links — do not edit the heading or the links by hand
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-10-26
+
 ### Added
 
 - "Send history" table on the PLR Reports page listing the 50 most recent returns from the message queue, with status and any failure code.
@@ -43,6 +45,7 @@ along with the comparison links — do not edit the heading or the links by hand
 
 - `build.sh`; `.kpz` files are now built by the release workflow.
 
-[Unreleased]: https://github.com/openfifth/koha-plugin-plr/compare/v1.2.2...HEAD
+[Unreleased]: https://github.com/openfifth/koha-plugin-plr/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/openfifth/koha-plugin-plr/compare/v1.2.2...v1.3.0
 [1.2.2]: https://github.com/openfifth/koha-plugin-plr/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/openfifth/koha-plugin-plr/compare/v1.2.0...v1.2.1
