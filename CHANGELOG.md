@@ -12,6 +12,8 @@ along with the comparison links — do not edit the heading or the links by hand
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-10-26
+
 ### Added
 
 - GitHub Actions workflow that runs the plugin tests against Koha main, stable and oldstable, and builds and publishes the `.kpz` on `v*.*.*` tags.
@@ -27,4 +29,5 @@ along with the comparison links — do not edit the heading or the links by hand
 
 - `build.sh`; `.kpz` files are now built by the release workflow.
 
-[Unreleased]: https://github.com/openfifth/koha-plugin-plr/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/openfifth/koha-plugin-plr/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/openfifth/koha-plugin-plr/compare/v1.2.0...v1.2.1
