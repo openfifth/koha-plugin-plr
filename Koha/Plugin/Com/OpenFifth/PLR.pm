@@ -6,8 +6,9 @@ use base qw(Koha::Plugins::Base);
 
 use C4::Context;
 use Koha::DateUtils qw(dt_from_string output_pref);
+use C4::Letters;
 use Koha::Email;
-use Koha::SMTP::Servers;
+use Koha::Notice::Messages;
 use DateTime;
 use File::Spec;
 use JSON qw(encode_json decode_json);
@@ -371,14 +372,13 @@ sub _send_single_report {
     my $subject        = "PLR Return for $authority_code - $authority_name";
     my $body           = "Dear PLR\n\nPlease find attached PLR return for $authority_code - $authority_name for the last period\n\n";
 
+    # Queue the message and send it straight away, so core keeps an audit
+    # trail (status and failure_code) of every return that was sent.
+    my ( $message_id, $error );
     eval {
-        my $email = Koha::Email->create(
-            {
-                from    => $email_from,
-                to      => $email_recipients,
-                subject => $subject,
-            }
-        );
+        # Compose the MIME message ourselves: the queue's own `attachments`
+        # option omits the filename from Content-Disposition.
+        my $email = Koha::Email->new;
         $email->text_body($body);
         $email->attach(
             $report_data->{content},
@@ -386,13 +386,35 @@ sub _send_single_report {
             filename     => $report_data->{filename},
             disposition  => 'attachment',
         );
-        $email->send_or_die( { transport => Koha::SMTP::Servers->get_default->transport } );
-    };
 
-    if ( $@ ) {
+        $message_id = C4::Letters::EnqueueLetter(
+            {
+                letter => {
+                    title          => $subject,
+                    content        => $email->as_string,
+                    code           => 'PLR_RETURN',
+                    'content-type' => 'message/rfc822',
+                },
+                message_transport_type => 'email',
+                to_address             => $email_recipients,
+                from_address           => $email_from,
+            }
+        );
+        die "Could not queue message\n" unless $message_id;
+
+        C4::Letters::SendQueuedMessages( { message_id => $message_id } );
+
+        my $message = Koha::Notice::Messages->find($message_id);
+        $error = $message->failure_code || $message->status
+            unless $message->status eq 'sent';
+    };
+    $error = $@ if $@;
+
+    if ($error) {
         return {
             success        => 0,
-            error          => "Email send failed: $@",
+            error          => "Email send failed: $error",
+            message_id     => $message_id,
             authority_code => $authority_code,
             authority_name => $authority_name,
         };
@@ -400,6 +422,7 @@ sub _send_single_report {
 
     return {
         success        => 1,
+        message_id     => $message_id,
         authority_code => $authority_code,
         authority_name => $authority_name,
     };
