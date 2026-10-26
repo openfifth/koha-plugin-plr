@@ -20,7 +20,7 @@
     <input type="hidden" name="class" value="[% CLASS %]"/>
     <input type="hidden" name="method" value="[% METHOD %]"/>
     <input type="hidden" name="save" value="1" />
-    <input type="hidden" name="report_count" id="report_count" value="[% reports.size %]" />
+    <input type="hidden" name="report_count" id="report_count" value="[% reports.size || 0 %]" />
 
     <fieldset class="rows">
         <legend>Reports</legend>
@@ -108,7 +108,7 @@
 <script>
 function addReport() {
     var tbody = document.getElementById('reports-tbody');
-    var count = parseInt(document.getElementById('report_count').value, 10);
+    var count = parseInt(document.getElementById('report_count').value, 10) || 0;
     var i = count;
 
     var tr = document.createElement('tr');

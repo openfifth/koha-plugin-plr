@@ -12,6 +12,10 @@ along with the comparison links — do not edit the heading or the links by hand
 
 ## [Unreleased]
 
+### Fixed
+
+- Adding the first report on a fresh install produced fields named `authority_code_NaN` because the report count started empty instead of 0.
+
 ### Changed
 
 - Minimum Koha version is now 24.11.
