@@ -12,6 +12,8 @@ along with the comparison links — do not edit the heading or the links by hand
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-10-26
+
 ### Fixed
 
 - Plugin silently failed to register (and so never appeared in the plugin list) on servers without `MIME::Lite` installed. Reports are now emailed with Koha's own `Koha::Email` and the default SMTP server, so the plugin has no dependencies beyond Koha itself.
@@ -33,5 +35,6 @@ along with the comparison links — do not edit the heading or the links by hand
 
 - `build.sh`; `.kpz` files are now built by the release workflow.
 
-[Unreleased]: https://github.com/openfifth/koha-plugin-plr/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/openfifth/koha-plugin-plr/compare/v1.2.2...HEAD
+[1.2.2]: https://github.com/openfifth/koha-plugin-plr/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/openfifth/koha-plugin-plr/compare/v1.2.0...v1.2.1
