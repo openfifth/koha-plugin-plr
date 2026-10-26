@@ -12,9 +12,13 @@ along with the comparison links — do not edit the heading or the links by hand
 
 ## [Unreleased]
 
+### Added
+
+- "Send history" table on the PLR Reports page listing the 50 most recent returns from the message queue, with status and any failure code.
+
 ### Changed
 
-- Reports are now queued in Koha's message queue (letter code `PLR_RETURN`) and sent immediately, so every return has a `message_queue` record with its status and any failure code. Queued messages have no patron, so they are not shown on any patron's Notices tab; query `message_queue` (for example with a SQL report) to review them.
+- Reports are now queued in Koha's message queue (letter code `PLR_RETURN`) and sent immediately, so every return has a `message_queue` record with its status and any failure code. Queued messages have no patron, so core does not show them on any patron's Notices tab; use the new send history on the PLR Reports page.
 
 ## [1.2.2] - 2026-10-26
 

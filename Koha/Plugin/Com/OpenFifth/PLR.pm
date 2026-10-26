@@ -135,7 +135,7 @@ sub report {
 
     if ( $action eq 'generate' ) {
         my $reports_data = $self->_generate_all_reports();
-        my $template = $self->get_template({ file => 'templates/report.tt' });
+        my $template = $self->_report_template();
         $template->param(
             reports_generated => 1,
             reports_data      => $reports_data,
@@ -159,23 +159,45 @@ sub report {
             }
         }
 
-        my $template = $self->get_template({ file => 'templates/report.tt' });
+        my $template = $self->_report_template();
         $template->param( error => 'Failed to generate report for download.' );
         $self->output_html( $template->output() );
     }
     elsif ( $action eq 'send' ) {
         my $send_results = $self->_send_all_reports();
-        my $template = $self->get_template({ file => 'templates/report.tt' });
+        my $template = $self->_report_template();
         $template->param( send_results => $send_results );
         $self->output_html( $template->output() );
     }
     else {
-        my $template = $self->get_template({ file => 'templates/report.tt' });
+        my $template = $self->_report_template();
         $self->output_html( $template->output() );
     }
 }
 
 # --- Private helpers ---
+
+sub _report_template {
+    my ( $self ) = @_;
+
+    my $template = $self->get_template({ file => 'templates/report.tt' });
+    $template->param( send_history => $self->_get_send_history() );
+
+    return $template;
+}
+
+# The most recent returns queued by this plugin, newest first. Core has no
+# staff view for messages without a patron, so we list them ourselves.
+sub _get_send_history {
+    my ( $self ) = @_;
+
+    my $messages = Koha::Notice::Messages->search(
+        { letter_code => 'PLR_RETURN' },
+        { order_by => { -desc => 'message_id' }, rows => 50 }
+    );
+
+    return [ $messages->as_list ];
+}
 
 sub _get_reports_config {
     my ( $self ) = @_;
