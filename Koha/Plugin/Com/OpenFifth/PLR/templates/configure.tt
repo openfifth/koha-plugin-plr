@@ -1,147 +1,110 @@
 [% USE raw %]
-[% USE Asset %]
 [% USE KohaDates %]
 [% PROCESS 'i18n.inc' %]
-[% SET footerjs = 1 %]
-[% INCLUDE 'doc-head-open.inc' %]
-<title>[% FILTER collapse %]
-    [% t("PLR Reports") | html %] &rsaquo;
-    [% t("Plugins") | html %] &rsaquo;
-    [% t("Koha") | html %]
-[% END %]</title>
-[% INCLUDE 'doc-head-close.inc' %]
-</head>
-<body id="plugins_plr_configure" class="plugins">
-[% WRAPPER 'header.inc' %]
-    [% INCLUDE 'cat-search.inc' %]
-[% END %]
+[% SET method = 'configure' %]
+[% SET plugin_title = t("PLR Reports") %]
+[% WRAPPER 'wrapper-staff-tool-plugin.inc' %]
+<h1>PLR Reports Configuration</h1>
 
-[% WRAPPER 'sub-header.inc' %]
-    [% WRAPPER breadcrumbs %]
-        [% WRAPPER breadcrumb_item %]
-            <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugins</a>
-        [% END %]
-        [% WRAPPER breadcrumb_item %]
-            <a href="/cgi-bin/koha/plugins/run.pl?class=[% CLASS | uri %]&method=report">PLR Reports</a>
-        [% END %]
-        [% WRAPPER breadcrumb_item bc_active= 1 %]
-            <span>Configuration</span>
-        [% END %]
-    [% END #/ WRAPPER breadcrumbs %]
-[% END #/ WRAPPER sub-header.inc %]
-
-<div id="main container-fluid">
-    <div class="row">
-        <div class="col-md-10 order-md-2 order-sm-1">
-            <main>
-                <h1>PLR Reports Configuration</h1>
-
-                <div class="alert alert-info">
-                    <h4>About Public Lending Right Reports</h4>
-                    <p>This plugin generates Public Lending Right (PLR) reports based on your library's loan statistics.
-                    The report includes issues and renewals from the previous calendar month, formatted for submission
-                    to the British Library.</p>
-                    <p><strong>Automated Sending:</strong> Enable automatic monthly sending via the cronjob_nightly hook,
-                    or generate reports manually from the report page.</p>
-                </div>
-
-                <form method="post">
-                    [% INCLUDE 'csrf-token.inc' %]
-                    <input type="hidden" name="class" value="[% CLASS %]"/>
-                    <input type="hidden" name="method" value="[% METHOD %]"/>
-                    <input type="hidden" name="save" value="1" />
-                    <input type="hidden" name="report_count" id="report_count" value="[% reports.size %]" />
-
-                    <fieldset class="rows">
-                        <legend>Reports</legend>
-                        <p>Each report generates a separate PLR submission. Where multiple authorities share one Koha system,
-                        use the Library Group ID to scope each report to the appropriate branches.</p>
-                        <table id="reports-table" class="table table-bordered table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Authority Code <span class="required">*</span></th>
-                                    <th>Authority Name <span class="required">*</span></th>
-                                    <th>Library Group ID</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="reports-tbody">
-                                [% FOREACH r IN reports %]
-                                    [% SET i = loop.index %]
-                                    <tr>
-                                        <td>
-                                            <input type="text" name="authority_code_[% i %]" value="[% r.authority_code | html %]" required class="form-control" />
-                                        </td>
-                                        <td>
-                                            <input type="text" name="authority_name_[% i %]" value="[% r.authority_name | html %]" required class="form-control" />
-                                        </td>
-                                        <td>
-                                            <input type="number" name="library_group_id_[% i %]" value="[% r.library_group_id | html %]" class="form-control" min="1" />
-                                            <div class="hint">Parent ID from library_groups table (leave blank for all branches)</div>
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-danger btn-sm" onclick="removeReport(this)">Remove</button>
-                                        </td>
-                                    </tr>
-                                [% END %]
-                            </tbody>
-                        </table>
-                        <button type="button" class="btn btn-default" onclick="addReport()">
-                            <i class="fa fa-plus"></i> Add report
-                        </button>
-                    </fieldset>
-
-                    <fieldset class="rows">
-                        <legend>Email Settings</legend>
-                        <ol>
-                            <li>
-                                <label for="email_recipients" class="required">Email Recipients: </label>
-                                <input type="text" id="email_recipients" name="email_recipients" value="[% email_recipients | html %]" size="80" required />
-                                <span class="required">Required</span>
-                                <div class="hint">Comma-separated email addresses (e.g., plrlibrary@bl.uk)</div>
-                            </li>
-                            <li>
-                                <label for="email_from">Email From: </label>
-                                <input type="text" id="email_from" name="email_from" value="[% email_from | html %]" />
-                                <div class="hint">Optional. Leave blank to send from Koha's default sender address (the KohaAdminEmailAddress system preference).</div>
-                            </li>
-                        </ol>
-                    </fieldset>
-
-                    <fieldset class="rows">
-                        <legend>Automated Sending</legend>
-                        <ol>
-                            <li>
-                                <label for="auto_send_enabled">Enable Automatic Sending: </label>
-                                <input type="checkbox" id="auto_send_enabled" name="auto_send_enabled" value="1" [% IF auto_send_enabled %]checked="checked"[% END %] />
-                                <div class="hint">Automatically send reports via the cronjob_nightly hook</div>
-                            </li>
-                            <li>
-                                <label for="send_day_of_month">Send Day of Month: </label>
-                                <select id="send_day_of_month" name="send_day_of_month">
-                                    [% FOREACH day IN [1..28] %]
-                                        <option value="[% day %]" [% IF send_day_of_month == day %]selected="selected"[% END %]>[% day %]</option>
-                                    [% END %]
-                                </select>
-                                <div class="hint">Day of the month to automatically send the report (typically 1st for previous month's data)</div>
-                            </li>
-                        </ol>
-                    </fieldset>
-
-                    <fieldset class="action">
-                        <input type="submit" class="btn btn-primary" value="Save configuration" />
-                        <a class="cancel" href="/cgi-bin/koha/plugins/plugins-home.pl">Cancel</a>
-                    </fieldset>
-                </form>
-            </main>
-        </div>
-        <div class="col-md-2 order-sm-2 order-md-1">
-            <aside></aside>
-        </div>
-    </div>
+<div class="alert alert-info">
+    <h4>About Public Lending Right Reports</h4>
+    <p>This plugin generates Public Lending Right (PLR) reports based on your library's loan statistics.
+    The report includes issues and renewals from the previous calendar month, formatted for submission
+    to the British Library.</p>
+    <p><strong>Automated Sending:</strong> Enable automatic monthly sending via the cronjob_nightly hook,
+    or generate reports manually from the report page.</p>
 </div>
 
-[% MACRO jsinclude BLOCK %]
+<form method="post">
+    [% INCLUDE 'csrf-token.inc' %]
+    <input type="hidden" name="class" value="[% CLASS %]"/>
+    <input type="hidden" name="method" value="[% METHOD %]"/>
+    <input type="hidden" name="save" value="1" />
+    <input type="hidden" name="report_count" id="report_count" value="[% reports.size %]" />
+
+    <fieldset class="rows">
+        <legend>Reports</legend>
+        <p>Each report generates a separate PLR submission. Where multiple authorities share one Koha system,
+        use the Library Group ID to scope each report to the appropriate branches.</p>
+        <table id="reports-table" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Authority Code <span class="required">*</span></th>
+                    <th>Authority Name <span class="required">*</span></th>
+                    <th>Library Group ID</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="reports-tbody">
+                [% FOREACH r IN reports %]
+                    [% SET i = loop.index %]
+                    <tr>
+                        <td>
+                            <input type="text" name="authority_code_[% i %]" value="[% r.authority_code | html %]" required class="form-control" />
+                        </td>
+                        <td>
+                            <input type="text" name="authority_name_[% i %]" value="[% r.authority_name | html %]" required class="form-control" />
+                        </td>
+                        <td>
+                            <input type="number" name="library_group_id_[% i %]" value="[% r.library_group_id | html %]" class="form-control" min="1" />
+                            <div class="hint">Parent ID from library_groups table (leave blank for all branches)</div>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeReport(this)">Remove</button>
+                        </td>
+                    </tr>
+                [% END %]
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-default" onclick="addReport()">
+            <i class="fa fa-plus"></i> Add report
+        </button>
+    </fieldset>
+
+    <fieldset class="rows">
+        <legend>Email Settings</legend>
+        <ol>
+            <li>
+                <label for="email_recipients" class="required">Email Recipients: </label>
+                <input type="text" id="email_recipients" name="email_recipients" value="[% email_recipients | html %]" size="80" required />
+                <span class="required">Required</span>
+                <div class="hint">Comma-separated email addresses (e.g., plrlibrary@bl.uk)</div>
+            </li>
+            <li>
+                <label for="email_from">Email From: </label>
+                <input type="text" id="email_from" name="email_from" value="[% email_from | html %]" />
+                <div class="hint">Optional. Leave blank to send from Koha's default sender address (the KohaAdminEmailAddress system preference).</div>
+            </li>
+        </ol>
+    </fieldset>
+
+    <fieldset class="rows">
+        <legend>Automated Sending</legend>
+        <ol>
+            <li>
+                <label for="auto_send_enabled">Enable Automatic Sending: </label>
+                <input type="checkbox" id="auto_send_enabled" name="auto_send_enabled" value="1" [% IF auto_send_enabled %]checked="checked"[% END %] />
+                <div class="hint">Automatically send reports via the cronjob_nightly hook</div>
+            </li>
+            <li>
+                <label for="send_day_of_month">Send Day of Month: </label>
+                <select id="send_day_of_month" name="send_day_of_month">
+                    [% FOREACH day IN [1..28] %]
+                        <option value="[% day %]" [% IF send_day_of_month == day %]selected="selected"[% END %]>[% day %]</option>
+                    [% END %]
+                </select>
+                <div class="hint">Day of the month to automatically send the report (typically 1st for previous month's data)</div>
+            </li>
+        </ol>
+    </fieldset>
+
+    <fieldset class="action">
+        <input type="submit" class="btn btn-primary" value="Save configuration" />
+        <a class="cancel" href="/cgi-bin/koha/plugins/plugins-home.pl">Cancel</a>
+    </fieldset>
+</form>
+
+
 <script>
 function addReport() {
     var tbody = document.getElementById('reports-tbody');
@@ -211,5 +174,3 @@ function reindexReports() {
 }
 </script>
 [% END %]
-
-[% INCLUDE 'intranet-bottom.inc' %]

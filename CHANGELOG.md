@@ -12,6 +12,11 @@ along with the comparison links — do not edit the heading or the links by hand
 
 ## [Unreleased]
 
+### Changed
+
+- Minimum Koha version is now 24.11.
+- The configuration and report pages use Koha's staff plugin template wrapper, so the page layout, breadcrumbs and side menu match the rest of the staff interface (Administration for configuration, Reports for the report page).
+
 ## [1.3.1] - 2026-10-26
 
 ### Changed

@@ -1,15 +1,9 @@
 [% USE raw %]
-[% USE Asset %]
 [% USE KohaDates %]
 [% PROCESS 'i18n.inc' %]
-[% SET footerjs = 1 %]
-[% INCLUDE 'doc-head-open.inc' %]
-<title>[% FILTER collapse %]
-    [% t("PLR Reports") | html %] &rsaquo;
-    [% t("Reports") | html %] &rsaquo;
-    [% t("Koha") | html %]
-[% END %]</title>
-[% INCLUDE 'doc-head-close.inc' %]
+[% SET method = 'report' %]
+[% SET plugin_title = t("PLR Reports") %]
+[% WRAPPER 'wrapper-staff-tool-plugin.inc' %]
 <style>
     .plr-report {
         background-color: #f5f5f5;
@@ -56,191 +50,161 @@
         margin: 20px 0;
     }
 </style>
-</head>
-<body id="plugins_plr_report" class="plugins">
-[% WRAPPER 'header.inc' %]
-    [% INCLUDE 'cat-search.inc' %]
+
+<h1>PLR Reports</h1>
+
+[% IF error %]
+    <div class="alert alert-danger">
+        <strong>Error:</strong> [% error | html %]
+    </div>
 [% END %]
 
-[% WRAPPER 'sub-header.inc' %]
-    [% WRAPPER breadcrumbs %]
-        [% WRAPPER breadcrumb_item %]
-            <a href="/cgi-bin/koha/reports/reports-home.pl">Reports</a>
+[% IF send_results %]
+    [% FOREACH r IN send_results %]
+        [% IF r.success %]
+            <div class="alert alert-success">
+                <strong>Sent:</strong> [% r.authority_code | html %] &ndash; [% r.authority_name | html %]
+            </div>
+        [% ELSE %]
+            <div class="alert alert-danger">
+                <strong>Failed ([% r.authority_code | html %]):</strong> [% r.error | html %]
+            </div>
         [% END %]
-        [% WRAPPER breadcrumb_item bc_active= 1 %]
-            <span>PLR Reports</span>
-        [% END %]
-    [% END #/ WRAPPER breadcrumbs %]
-[% END #/ WRAPPER sub-header.inc %]
+    [% END %]
+[% END %]
 
-<div id="main container-fluid">
-    <div class="row">
-        <div class="col-md-10 order-md-2 order-sm-1">
-            <main>
-                <h1>PLR Reports</h1>
+<p>Generate Public Lending Right (PLR) reports for submission to the British Library.</p>
+<p>Reports include loan statistics (issues and renewals) from the previous calendar month.</p>
 
-                [% IF error %]
-                    <div class="alert alert-danger">
-                        <strong>Error:</strong> [% error | html %]
-                    </div>
-                [% END %]
+<div class="button-group">
+    <form method="post">
+        [% INCLUDE 'csrf-token.inc' %]
+        <input type="hidden" name="class" value="[% CLASS %]"/>
+        <input type="hidden" name="method" value="[% METHOD %]"/>
+        <input type="hidden" name="action" value="generate" />
+        <button type="submit" class="btn btn-primary">
+            <i class="fa fa-file-text"></i> Generate Reports
+        </button>
+    </form>
 
-                [% IF send_results %]
-                    [% FOREACH r IN send_results %]
-                        [% IF r.success %]
-                            <div class="alert alert-success">
-                                <strong>Sent:</strong> [% r.authority_code | html %] &ndash; [% r.authority_name | html %]
-                            </div>
-                        [% ELSE %]
-                            <div class="alert alert-danger">
-                                <strong>Failed ([% r.authority_code | html %]):</strong> [% r.error | html %]
-                            </div>
-                        [% END %]
-                    [% END %]
-                [% END %]
-
-                <p>Generate Public Lending Right (PLR) reports for submission to the British Library.</p>
-                <p>Reports include loan statistics (issues and renewals) from the previous calendar month.</p>
-
-                <div class="button-group">
-                    <form method="post">
-                        [% INCLUDE 'csrf-token.inc' %]
-                        <input type="hidden" name="class" value="[% CLASS %]"/>
-                        <input type="hidden" name="method" value="[% METHOD %]"/>
-                        <input type="hidden" name="action" value="generate" />
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fa fa-file-text"></i> Generate Reports
-                        </button>
-                    </form>
-
-                    [% IF reports_generated %]
-                        <form method="post">
-                            [% INCLUDE 'csrf-token.inc' %]
-                            <input type="hidden" name="class" value="[% CLASS %]"/>
-                            <input type="hidden" name="method" value="[% METHOD %]"/>
-                            <input type="hidden" name="action" value="send" />
-                            <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to send all reports to the British Library?');">
-                                <i class="fa fa-envelope"></i> Send All Reports
-                            </button>
-                        </form>
-                    [% END %]
-                </div>
-
-                [% IF reports_generated %]
-                    [% FOREACH r IN reports_data %]
-                        <div class="plr-report-block">
-                            <h3>[% r.authority_code | html %] &ndash; [% r.authority_name | html %]</h3>
-
-                            <div class="plr-stats">
-                                <dl>
-                                    <dt>Report Period:</dt>
-                                    <dd>[% r.start_date | html %] &ndash; [% r.end_date | html %]</dd>
-
-                                    <dt>Total ISBNs:</dt>
-                                    <dd>[% r.isbn_count | html %]</dd>
-
-                                    <dt>Total Issues:</dt>
-                                    <dd>[% r.issue_count | html %]</dd>
-
-                                    <dt>Filename:</dt>
-                                    <dd>[% r.filename | html %]</dd>
-                                </dl>
-                            </div>
-
-                            <h4>Report Preview</h4>
-                            <p>This is the content that will be sent to the British Library:</p>
-                            <div class="plr-report">[% r.content | html %]</div>
-
-                            <form method="post" style="display:inline-block;">
-                                [% INCLUDE 'csrf-token.inc' %]
-                                <input type="hidden" name="class" value="[% CLASS %]"/>
-                                <input type="hidden" name="method" value="[% METHOD %]"/>
-                                <input type="hidden" name="action" value="download" />
-                                <input type="hidden" name="report_index" value="[% r.report_index %]" />
-                                <button type="submit" class="btn btn-default">
-                                    <i class="fa fa-download"></i> Download
-                                </button>
-                            </form>
-                        </div>
-                    [% END %]
-
-                    <div class="alert alert-info">
-                        <h4>Report Format</h4>
-                        <p>The report follows the PLR standard format:</p>
-                        <ul>
-                            <li><strong>Header:</strong> Authority Code | Start Date | End Date</li>
-                            <li><strong>Data Lines:</strong> ISBN | Issue Count | Copy Count | Author Code | Item Type</li>
-                            <li><strong>Footer:</strong> Total ISBNs | Total Issues</li>
-                        </ul>
-                    </div>
-                [% END %]
-
-                <hr />
-
-                <h2>Send history</h2>
-                [% IF send_history.size %]
-                    <table class="table table-striped table-condensed">
-                        <thead>
-                            <tr>
-                                <th>Queued</th>
-                                <th>Subject</th>
-                                <th>Sent to</th>
-                                <th>Status</th>
-                                <th>Message</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            [% FOREACH m IN send_history %]
-                                <tr>
-                                    <td>[% m.time_queued | $KohaDates with_hours => 1 %]</td>
-                                    <td>[% m.subject | html %]</td>
-                                    <td>[% m.to_address | html %]</td>
-                                    <td>
-                                        [% IF m.status == 'sent' %]
-                                            <span class="badge text-bg-success">Sent</span>
-                                        [% ELSIF m.status == 'failed' %]
-                                            <span class="badge text-bg-danger">Failed</span>
-                                            [% IF m.failure_code %]([% m.failure_code | html %])[% END %]
-                                        [% ELSE %]
-                                            <span class="badge text-bg-secondary">[% m.status | html %]</span>
-                                        [% END %]
-                                    </td>
-                                    <td>#[% m.message_id | html %]</td>
-                                </tr>
-                            [% END %]
-                        </tbody>
-                    </table>
-                    <p class="hint">Showing the 50 most recent returns, from Koha's message queue.</p>
-                [% ELSE %]
-                    <p>No reports have been sent yet.</p>
-                [% END %]
-
-                <hr />
-
-                <h2>Information</h2>
-                <div class="alert alert-info">
-                    <p>
-                        <strong>About PLR Reports:</strong> The Public Lending Right (PLR) is the right for authors to receive payment
-                        for the loans of their books from public libraries. This plugin generates reports of lending activity
-                        to be submitted to the British Library.
-                    </p>
-                    <p>
-                        <strong>Automated Sending:</strong> You can configure the plugin to automatically send reports on a
-                        specific day of each month. Configure this in the <a href="/cgi-bin/koha/plugins/run.pl?class=[% CLASS | uri %]&method=configure">plugin settings</a>.
-                    </p>
-                    <p>
-                        <strong>Manual Sending:</strong> Use this page to generate, preview, and manually send reports at any time.
-                    </p>
-                </div>
-            </main>
-        </div>
-        <div class="col-md-2 order-sm-2 order-md-1">
-            <aside></aside>
-        </div>
-    </div>
+    [% IF reports_generated %]
+        <form method="post">
+            [% INCLUDE 'csrf-token.inc' %]
+            <input type="hidden" name="class" value="[% CLASS %]"/>
+            <input type="hidden" name="method" value="[% METHOD %]"/>
+            <input type="hidden" name="action" value="send" />
+            <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to send all reports to the British Library?');">
+                <i class="fa fa-envelope"></i> Send All Reports
+            </button>
+        </form>
+    [% END %]
 </div>
 
-[% MACRO jsinclude BLOCK %]
+[% IF reports_generated %]
+    [% FOREACH r IN reports_data %]
+        <div class="plr-report-block">
+            <h3>[% r.authority_code | html %] &ndash; [% r.authority_name | html %]</h3>
+
+            <div class="plr-stats">
+                <dl>
+                    <dt>Report Period:</dt>
+                    <dd>[% r.start_date | html %] &ndash; [% r.end_date | html %]</dd>
+
+                    <dt>Total ISBNs:</dt>
+                    <dd>[% r.isbn_count | html %]</dd>
+
+                    <dt>Total Issues:</dt>
+                    <dd>[% r.issue_count | html %]</dd>
+
+                    <dt>Filename:</dt>
+                    <dd>[% r.filename | html %]</dd>
+                </dl>
+            </div>
+
+            <h4>Report Preview</h4>
+            <p>This is the content that will be sent to the British Library:</p>
+            <div class="plr-report">[% r.content | html %]</div>
+
+            <form method="post" style="display:inline-block;">
+                [% INCLUDE 'csrf-token.inc' %]
+                <input type="hidden" name="class" value="[% CLASS %]"/>
+                <input type="hidden" name="method" value="[% METHOD %]"/>
+                <input type="hidden" name="action" value="download" />
+                <input type="hidden" name="report_index" value="[% r.report_index %]" />
+                <button type="submit" class="btn btn-default">
+                    <i class="fa fa-download"></i> Download
+                </button>
+            </form>
+        </div>
+    [% END %]
+
+    <div class="alert alert-info">
+        <h4>Report Format</h4>
+        <p>The report follows the PLR standard format:</p>
+        <ul>
+            <li><strong>Header:</strong> Authority Code | Start Date | End Date</li>
+            <li><strong>Data Lines:</strong> ISBN | Issue Count | Copy Count | Author Code | Item Type</li>
+            <li><strong>Footer:</strong> Total ISBNs | Total Issues</li>
+        </ul>
+    </div>
 [% END %]
 
-[% INCLUDE 'intranet-bottom.inc' %]
+<hr />
+
+<h2>Send history</h2>
+[% IF send_history.size %]
+    <table class="table table-striped table-condensed">
+        <thead>
+            <tr>
+                <th>Queued</th>
+                <th>Subject</th>
+                <th>Sent to</th>
+                <th>Status</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            [% FOREACH m IN send_history %]
+                <tr>
+                    <td>[% m.time_queued | $KohaDates with_hours => 1 %]</td>
+                    <td>[% m.subject | html %]</td>
+                    <td>[% m.to_address | html %]</td>
+                    <td>
+                        [% IF m.status == 'sent' %]
+                            <span class="badge text-bg-success">Sent</span>
+                        [% ELSIF m.status == 'failed' %]
+                            <span class="badge text-bg-danger">Failed</span>
+                            [% IF m.failure_code %]([% m.failure_code | html %])[% END %]
+                        [% ELSE %]
+                            <span class="badge text-bg-secondary">[% m.status | html %]</span>
+                        [% END %]
+                    </td>
+                    <td>#[% m.message_id | html %]</td>
+                </tr>
+            [% END %]
+        </tbody>
+    </table>
+    <p class="hint">Showing the 50 most recent returns, from Koha's message queue.</p>
+[% ELSE %]
+    <p>No reports have been sent yet.</p>
+[% END %]
+
+<hr />
+
+<h2>Information</h2>
+<div class="alert alert-info">
+    <p>
+        <strong>About PLR Reports:</strong> The Public Lending Right (PLR) is the right for authors to receive payment
+        for the loans of their books from public libraries. This plugin generates reports of lending activity
+        to be submitted to the British Library.
+    </p>
+    <p>
+        <strong>Automated Sending:</strong> You can configure the plugin to automatically send reports on a
+        specific day of each month. Configure this in the <a href="/cgi-bin/koha/plugins/run.pl?class=[% CLASS | uri %]&method=configure">plugin settings</a>.
+    </p>
+    <p>
+        <strong>Manual Sending:</strong> Use this page to generate, preview, and manually send reports at any time.
+    </p>
+</div>
+
+[% END %]

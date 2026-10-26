@@ -14,7 +14,7 @@ use File::Spec;
 use JSON qw(encode_json decode_json);
 
 our $VERSION         = '1.3.1';
-our $MINIMUM_VERSION = "22.05.00.000";
+our $MINIMUM_VERSION = "24.11.00.000";
 
 our $metadata = {
     name            => 'PLR Reports',
