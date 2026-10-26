@@ -132,16 +132,14 @@ Example:
 
 ## Installation Steps
 
-1. **Build the plugin:**
-   ```bash
-   cd /home/martin/Projects/koha-plugins/koha-plugin-plr
-   ./build.sh
-   ```
+1. **Download the plugin:**
+   Get the latest `.kpz` from the
+   [GitHub releases](https://github.com/openfifth/koha-plugin-plr/releases) page.
 
 2. **Upload to Koha:**
    - Go to Tools > Plugins
    - Click "Upload plugin"
-   - Select `koha-plugin-plr-v1.0.0.kpz`
+   - Select the downloaded `.kpz` file
    - Click "Upload"
 
 3. **Configure:**

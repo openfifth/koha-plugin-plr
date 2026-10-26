@@ -4,12 +4,12 @@ Get started with the Koha PLR Reports Plugin in 5 minutes.
 
 ## 1. Install the Plugin
 
-The plugin package has already been built: `koha-plugin-plr-v1.0.0.kpz`
+Download the latest `.kpz` from the [GitHub releases](https://github.com/openfifth/koha-plugin-plr/releases) page.
 
 In Koha:
 1. Navigate to: **Home > Tools > Plugins**
 2. Click **"Upload plugin"**
-3. Select `koha-plugin-plr-v1.0.0.kpz`
+3. Select the downloaded `.kpz` file
 4. Click **"Upload"**
 
 ## 2. Configure the Plugin
@@ -70,7 +70,7 @@ Once the plugin is working:
 crontab -e
 
 # Remove or comment out the old line:
-# 0 1 1 * * /home/martin/Projects/scripts/koha/Custom/get_plr_usage.sh
+# 0 1 1 * * /path/to/get_plr_usage.sh
 ```
 
 ## Pre-populated Defaults
